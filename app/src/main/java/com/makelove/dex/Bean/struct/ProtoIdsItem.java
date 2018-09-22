@@ -29,7 +29,16 @@ public class ProtoIdsItem {
 	
 	@Override
 	public String toString(){
-		return "shorty_idx:"+shorty_idx+",return_type_idx:"+return_type_idx+",parameters_off:"+parameters_off;
+		return "shorty_idx:"+shorty_idx
+				+",return_type_idx:"+return_type_idx+
+				",parameters_off: "+parameters_off+
+				",parametersList: "+
+				//判断 参数 列表 是否有数据
+				(parametersList.size()!=0?parametersList.toString():"")
+				//默认 为 0 等于 0打印 ""
+				//开始 位置
+				+",parameterCount: "+(parameterCount==0?"0":parametersList.size()+"");
+
 	}
 
 }

@@ -192,7 +192,8 @@ public class ParseDexUtils {
 
 	/**
 	 *解析字符串的 Item 的偏移地址
-	 * （存放的是地址 不是数据 ）
+	 * （stringIdsList 存放的是地址 不是数据 ）
+     * 然后将 地址里面的 内容 转换成 字符串
 	 * @param srcByte
 	 */
 	public static void parseStringIds(byte[] srcByte){
@@ -206,27 +207,22 @@ public class ParseDexUtils {
 					stringIdsOffset+i*idSize, idSize)));
 		}
 		LogUtils.e("string size:"+stringIdsList.size());
-	}
 
-	/**
-	 * 解析字符串的List
-	 * （根据 偏移地址 拿到对应数据）
-	 * @param srcByte
-	 */
-	public static void parseStringList(byte[] srcByte){
-		//第一个字节还是字符串的长度
-		for(StringIdsItem item : stringIdsList){
-			String str = getString(srcByte, item.string_data_off);
+
+        for(StringIdsItem item : stringIdsList){
+            String str = getString(srcByte, item.string_data_off);
 //			LogUtils.e("开始偏移地址:"+item.string_data_off);
-			LogUtils.e("str:"+str);
-			stringList.add(str);
-		}
-
+            LogUtils.e("str:"+str);
+            stringList.add(str);
+        }
 	}
 
 
+
+
 	/**
-	 * 解析TypeId  (存放dex里面所有的类型)
+	 * 解析TypeId
+     * (存放dex里面所有的类型)
 	 * @param srcByte
 	 */
 	public static void parseTypeIds(byte[] srcByte){
@@ -239,7 +235,7 @@ public class ParseDexUtils {
 		//这里的descriptor_idx就是解析之后的字符串中的索引值
 		for(TypeIdsItem item : typeIdsList){
 			int descriptor_idx = item.descriptor_idx;
-			//LogUtils.e(""+descriptor_idx);
+//			LogUtils.e("在 StringList中的 位置 "+descriptor_idx);
 			LogUtils.e("typeStr:"+stringList.get(descriptor_idx));
 		}
 	}
@@ -255,7 +251,6 @@ public class ParseDexUtils {
 		//个数
 		int countIds = protoIdsSize;
 
-
 		for(int i=0;i<countIds;i++){
 			protoIdsList.add(parseProtoIdsItem(Utils.copyByte(srcByte,
                     protoIdsOffset+i*idSize, idSize)));
@@ -263,10 +258,22 @@ public class ParseDexUtils {
 
         for(ProtoIdsItem item : protoIdsList){
 			LogUtils.e("proto:"+stringList.get(item.shorty_idx)
-					+","+stringList.get(item.return_type_idx));
+                    //return_type_idx 指向的是 TypeIndex
+                    // 相当于stringList  如果 是 0 返回是 void  没有返回类型
+					+","+stringList.get(typeIdsList.get
+                    //typeIds 指向的是 StringList的idx
+                    //而return_type_idx 指向  typeIds
+                    //return_type_idx-> TypeIndex->  stringListIdx
+                    (item.return_type_idx).descriptor_idx));
+
 			if(item.parameters_off != 0){
-				item = parseParameterTypeList(srcByte, item.parameters_off, item);
+			    //说明有参数 重新赋值打印
+                ProtoIdsItem itemHasParmeter = parseParameterTypeList(srcByte, item.parameters_off, item);
+                itemHasParmeter.shorty_idx=item.shorty_idx;
+                itemHasParmeter.return_type_idx=item.return_type_idx;
 			}
+			LogUtils.e("ProtoIdsItem  item",item.toString());
+
 		}
 	}
 
@@ -280,34 +287,44 @@ public class ParseDexUtils {
 	 */
     //解析方法的所有参数类型
 	private static ProtoIdsItem parseParameterTypeList(byte[] srcByte, int startOff, ProtoIdsItem item){
+        //ParameterTypeList  是由一个 size 和一个 short 集合表示
+
         //因为保存的是地址 先拿到地址的byte 转换成 相对应的数值
         //指针4字节
 		byte[] sizeByte = Utils.copyByte(srcByte, startOff, 4);
         //size 是 有几个 参数 的 size
 		int size = Utils.byte2int(sizeByte);
-		List<String> parametersList = new ArrayList<String>();
-		List<Short> typeList = new ArrayList<Short>(size);
 
+		List<String> parametersList = new ArrayList<String>();
+		//存放的也是 index  但是用 short储存的
+        //储存的也是 Typelist的 位置   所以 默认就是 StringList的 位置
+		List<Short> typeList = new ArrayList<Short>(size);
 		for(int i=0;i<size;i++){
 		    // +4 +2*i 前面的 4是 size的 int 大小
             //后面的 short的大小 short占2字节
+            //因为 指向的 是一个 Type类型 开始地址 包含了 具体 可看 图片
 			byte[] typeByte = Utils.copyByte(srcByte, startOff+4+2*i, 2);
 			typeList.add(Utils.byte2Short(typeByte));
 		}
 		LogUtils.e("param count:"+size);
 
-        
+
 
 		for(int i=0;i<typeList.size();i++){
-            Short aShort = typeList.get(i);
-            LogUtils.e("type:"+stringList.get(aShort));
-			int index = typeIdsList.get(aShort).descriptor_idx;
-			parametersList.add(stringList.get(index));
+            //拿到 具体 位置 short 是为了压缩空间
+            //int是 4个字节 short是 2个
+            //拿到 TypeList的 位置
+            //拿到 typeID对应的 string
+            //***这块需要注意 TYPEID和 String 不一定一一对应
+            int StringIndex = typeIdsList.get(typeList.get(i)).descriptor_idx;
+            //参数 名称
+            String ParameterStr = stringList.get(StringIndex);
+            parametersList.add(ParameterStr);
 		}
-		
+
 		item.parameterCount = size;
 		item.parametersList = parametersList;
-		
+
 		return item;
 	}
 
@@ -664,12 +681,20 @@ public class ParseDexUtils {
 		item.offset = Utils.byte2int(offsetByte);
 		return item;
 	}
-	
 
+
+	/**
+	 *
+	 * 根据偏移地址 返回字符串
+	 * @param srcByte  原数据
+	 * @param startOff 开始偏移地址 （位置 index）
+	 * @return
+	 */
 	private static String getString(byte[] srcByte, int startOff){
-		//第一个字节还是字符串的长度
+		//第一个字节是字符串的长度
 		byte size = srcByte[startOff];
 		byte[] strByte = Utils.copyByte(srcByte, startOff+1, size);
+
 		String result = "";
 		try{
 			result = new String(strByte, "UTF-8");

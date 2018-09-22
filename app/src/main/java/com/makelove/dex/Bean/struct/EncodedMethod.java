@@ -13,9 +13,12 @@ public class EncodedMethod {
 			uleb128 code_off;
 		}
 	 */
-	
+
+	//都是 uleb128类型的
+	//长度都是 可变的
 	public byte[] method_idx_diff;
 	public byte[] access_flags;
+	//存放 dataItem的 偏移
 	public byte[] code_off;
 	
 	@Override

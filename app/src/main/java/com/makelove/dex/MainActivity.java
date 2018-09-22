@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements PermissionCallBac
 
 
     private void Test() {
-        String path = DexUtilis.getSDPath() + "/" + "Dex" + "/" + "classes.dex";
+        String path = DexUtilis.getSDPath() + "/" + "Dex" + "/" + "log.dex";
 
         byte[] srcByte = DexUtilis.Dex(path);
 
@@ -89,61 +89,58 @@ public class MainActivity extends AppCompatActivity implements PermissionCallBac
 
 
 
-        LogUtils.e("Parse StringIds:");
+        LogUtils.e("Parse StringList:");
         ParseDexUtils.parseStringIds(srcByte);
         LogUtils.e("Parse StringIds:","++++++++++++++++++++++++++++++++++++++++");
 
 
 
 
-        LogUtils.e("Parse StringList:");
-        ParseDexUtils.parseStringList(srcByte);
-        LogUtils.e("Parse StringList:","++++++++++++++++++++++++++++++++++++++++");
 
 
 
-//
+
         LogUtils.e("Parse TypeIds:");
         ParseDexUtils.parseTypeIds(srcByte);
         LogUtils.e("Parse TypeIds:","++++++++++++++++++++++++++++++++++++++++");
-
-
-
-
+//
+//
+//
+//
         LogUtils.e("Parse ProtoIds:");
         ParseDexUtils.parseProtoIds(srcByte);
         LogUtils.e("Parse ProtoIds:","++++++++++++++++++++++++++++++++++++++++");
-
-
-
-
 //
-        LogUtils.e("Parse FieldIds:");
-        ParseDexUtils.parseFieldIds(srcByte);
-        LogUtils.e("Parse FieldIds:","++++++++++++++++++++++++++++++++++++++++");
-
-
 //
-        LogUtils.e("Parse MethodIds:");
-        ParseDexUtils.parseMethodIds(srcByte);
-        LogUtils.e("Parse MethodIds:","++++++++++++++++++++++++++++++++++++++++");
-
-
 //
-        LogUtils.e("Parse ClassDefIds:");
-        ParseDexUtils.parseClassDefIds(srcByte);
-        LogUtils.e("Parse ClassDefIds:","++++++++++++++++++++++++++++++++++++++++");
-
-
-
-
-        LogUtils.e("Parse MapList:");
-        ParseDexUtils.parseMapItemList(srcByte);
-        LogUtils.e("Parse MapList:","++++++++++++++++++++++++++++++++++++++++");
-
-        LogUtils.e("Parse Class Data:");
-        ParseDexUtils.parseClassData(srcByte);
-        LogUtils.e("Parse Class Data:","++++++++++++++++++++++++++++++++++++++++");
+//
+////
+//        LogUtils.e("Parse FieldIds:");
+//        ParseDexUtils.parseFieldIds(srcByte);
+//        LogUtils.e("Parse FieldIds:","++++++++++++++++++++++++++++++++++++++++");
+//
+//
+////
+//        LogUtils.e("Parse MethodIds:");
+//        ParseDexUtils.parseMethodIds(srcByte);
+//        LogUtils.e("Parse MethodIds:","++++++++++++++++++++++++++++++++++++++++");
+//
+//
+////
+//        LogUtils.e("Parse ClassDefIds:");
+//        ParseDexUtils.parseClassDefIds(srcByte);
+//        LogUtils.e("Parse ClassDefIds:","++++++++++++++++++++++++++++++++++++++++");
+//
+//
+//
+//
+//        LogUtils.e("Parse MapList:");
+//        ParseDexUtils.parseMapItemList(srcByte);
+//        LogUtils.e("Parse MapList:","++++++++++++++++++++++++++++++++++++++++");
+//
+//        LogUtils.e("Parse Class Data:");
+//        ParseDexUtils.parseClassData(srcByte);
+//        LogUtils.e("Parse Class Data:","++++++++++++++++++++++++++++++++++++++++");
 
 
 

@@ -21,7 +21,6 @@ public class TypeIdsItem {
 	@Override
 	public String toString(){
 		return Utils.bytesToHexString(Utils.int2Byte(descriptor_idx));
-		//return Utils.byte2String(Utils.int2Byte(descriptor_idx));
 	}
 
 }
