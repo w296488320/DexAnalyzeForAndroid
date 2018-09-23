@@ -13,7 +13,7 @@ public class ProtoIdsItem {
 		uint parameters_off;
 		}
 	 */
-	
+	//StringList 的 idx
 	public int shorty_idx;
 	public int return_type_idx;
 	//储存的是TypeID的地址 TypeID 指向string 的地址

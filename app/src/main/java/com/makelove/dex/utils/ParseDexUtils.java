@@ -257,6 +257,7 @@ public class ParseDexUtils {
 		}
 
         for(ProtoIdsItem item : protoIdsList){
+			//L是变量自定义类 ， V是 void  I是 Int
 			LogUtils.e("proto:"+stringList.get(item.shorty_idx)
                     //return_type_idx 指向的是 TypeIndex
                     // 相当于stringList  如果 是 0 返回是 void  没有返回类型
@@ -294,10 +295,13 @@ public class ParseDexUtils {
 		byte[] sizeByte = Utils.copyByte(srcByte, startOff, 4);
         //size 是 有几个 参数 的 size
 		int size = Utils.byte2int(sizeByte);
-
+		//这个 list是参数列表的 list 每一个 方法 都有自己的参数列表
 		List<String> parametersList = new ArrayList<String>();
 		//存放的也是 index  但是用 short储存的
-        //储存的也是 Typelist的 位置   所以 默认就是 StringList的 位置
+        //储存的也是 Typelist的 位置
+		// 需要先拿到 Typelist的 位置  然后拿到里面的
+		// descriptor_idx 在从string 里面找到
+		// 所以 默认就是 StringList的 位置
 		List<Short> typeList = new ArrayList<Short>(size);
 		for(int i=0;i<size;i++){
 		    // +4 +2*i 前面的 4是 size的 int 大小
@@ -345,6 +349,8 @@ public class ParseDexUtils {
 			int classIndex = typeIdsList.get(item.class_idx).descriptor_idx;
 			int typeIndex = typeIdsList.get(item.type_idx).descriptor_idx;
 			LogUtils.e("class:"+stringList.get(classIndex)+",name:"
+					//NameIdx 指向stringList的 idx
+					//其他两个指向的typeID
                     +stringList.get(item.name_idx)+
                     ",type:"+stringList.get(typeIndex));
 		}
@@ -352,28 +358,41 @@ public class ParseDexUtils {
 
 	/**
 	 * 解析 MethodIds
+	 *
 	 * @param srcByte
 	 */
 	public static void parseMethodIds(byte[] srcByte){
 		int idSize = MethodIdsItem.getSize();
 		int countIds = methodIdsSize;
 		for(int i=0;i<countIds;i++){
-			methodIdsList.add(parseMethodIdsItem(Utils.copyByte(srcByte, methodIdsOffset+i*idSize, idSize)));
+			methodIdsList.add(parseMethodIdsItem(Utils.copyByte(srcByte,
+					methodIdsOffset+i*idSize, idSize)));
 		}
 		
 		for(MethodIdsItem item : methodIdsList){
+			//class_idx  指向 typeIdsListIdx
+			//proto_idx  指向 protoIdsListIds
+			//name_idx   指向  StringListIds
+
+			//方法原型 =返回类型 +参数列表
 			int classIndex = typeIdsList.get(item.class_idx).descriptor_idx;
+
 			int returnIndex = protoIdsList.get(item.proto_idx).return_type_idx;
 			String returnTypeStr = stringList.get(typeIdsList.get(returnIndex).descriptor_idx);
-			int shortIndex = protoIdsList.get(item.proto_idx).shorty_idx;
-			String shortStr = stringList.get(shortIndex);
+
+//			int shortIndex = protoIdsList.get(item.proto_idx).shorty_idx;
+//			String shortStr = stringList.get(shortIndex);
+
 			List<String> paramList = protoIdsList.get(item.proto_idx).parametersList;
 			StringBuilder parameters = new StringBuilder();
-			parameters.append(returnTypeStr+"(");
-			for(String str : paramList){
-				parameters.append(str+",");
-			}
-			parameters.append(")"+shortStr);
+			//if (paramList.size() != 0) {
+				parameters.append(returnTypeStr+"(");
+				for(String str : paramList){
+					parameters.append(str+",");
+				}
+				//parameters.append(")"+shortStr);
+				parameters.append(")");
+			//}
 			LogUtils.e("class:"+stringList.get(classIndex)+",name:"+stringList.get(item.name_idx)+",proto:"+parameters);
 		}
 		

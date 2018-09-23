@@ -12,6 +12,7 @@ public class MethodIdsItem {
 	 */
 	
 	public short class_idx;
+	//方法原型 =返回类型 +参数列表
 	public short proto_idx;
 	public int name_idx;
 	

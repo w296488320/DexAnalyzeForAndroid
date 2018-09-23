@@ -115,15 +115,15 @@ public class MainActivity extends AppCompatActivity implements PermissionCallBac
 //
 //
 ////
-//        LogUtils.e("Parse FieldIds:");
-//        ParseDexUtils.parseFieldIds(srcByte);
-//        LogUtils.e("Parse FieldIds:","++++++++++++++++++++++++++++++++++++++++");
+        LogUtils.e("Parse FieldIds:");
+        ParseDexUtils.parseFieldIds(srcByte);
+        LogUtils.e("Parse FieldIds:","++++++++++++++++++++++++++++++++++++++++");
 //
 //
 ////
-//        LogUtils.e("Parse MethodIds:");
-//        ParseDexUtils.parseMethodIds(srcByte);
-//        LogUtils.e("Parse MethodIds:","++++++++++++++++++++++++++++++++++++++++");
+        LogUtils.e("Parse MethodIds:");
+        ParseDexUtils.parseMethodIds(srcByte);
+        LogUtils.e("Parse MethodIds:","++++++++++++++++++++++++++++++++++++++++");
 //
 //
 ////

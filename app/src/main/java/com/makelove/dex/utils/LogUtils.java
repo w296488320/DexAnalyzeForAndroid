@@ -16,7 +16,7 @@ public class LogUtils {
 	public static void e(String msg){
 
 		if(enableLog){
-			Log.e("lyh", msg);
+			Log.e("Q296488320", msg);
 		}
 	}
 
