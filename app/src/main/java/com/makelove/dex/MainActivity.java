@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements PermissionCallBac
 
 
     private void Test() {
-        String path = DexUtilis.getSDPath() + "/" + "Dex" + "/" + "log.dex";
+        String path = DexUtilis.getSDPath() + "/" + "Dex" + "/" + "classes.dex";
 
         byte[] srcByte = DexUtilis.Dex(path);
 
@@ -124,28 +124,28 @@ public class MainActivity extends AppCompatActivity implements PermissionCallBac
         LogUtils.e("Parse MethodIds:");
         ParseDexUtils.parseMethodIds(srcByte);
         LogUtils.e("Parse MethodIds:","++++++++++++++++++++++++++++++++++++++++");
-//
-//
-////
-//        LogUtils.e("Parse ClassDefIds:");
-//        ParseDexUtils.parseClassDefIds(srcByte);
-//        LogUtils.e("Parse ClassDefIds:","++++++++++++++++++++++++++++++++++++++++");
-//
-//
-//
-//
-//        LogUtils.e("Parse MapList:");
-//        ParseDexUtils.parseMapItemList(srcByte);
-//        LogUtils.e("Parse MapList:","++++++++++++++++++++++++++++++++++++++++");
-//
-//        LogUtils.e("Parse Class Data:");
-//        ParseDexUtils.parseClassData(srcByte);
-//        LogUtils.e("Parse Class Data:","++++++++++++++++++++++++++++++++++++++++");
 
 
 
 
+        LogUtils.e("Parse ClassDefIds:");
+        ParseDexUtils.parseClassDefIds(srcByte);
+        LogUtils.e("Parse ClassDefIds:","++++++++++++++++++++++++++++++++++++++++");
 //
+//
+//
+//
+        LogUtils.e("Parse MapList:");
+        ParseDexUtils.parseMapItemList(srcByte);
+        LogUtils.e("Parse MapList:","++++++++++++++++++++++++++++++++++++++++");
+
+        LogUtils.e("Parse Class Data:");
+        ParseDexUtils.parseClassData(srcByte);
+        LogUtils.e("Parse Class Data:","++++++++++++++++++++++++++++++++++++++++");
+
+
+
+
 //        LogUtils.e("Parse Code Content:");
 //        ParseDexUtils.parseCode(srcByte);
 //        LogUtils.e("Parse Code Content:","++++++++++++++++++++++++++++++++++++++++");

@@ -36,13 +36,19 @@ public class Utils {
         return b; 
     } 
 	
-    public static short byte2Short(byte[] b) { 
-        short s = 0; 
-        short s0 = (short) (b[0] & 0xff);
-        short s1 = (short) (b[1] & 0xff); 
-        s1 <<= 8; 
-        s = (short) (s0 | s1); 
-        return s; 
+    public static short byte2Short(byte[] b) {
+		short s = 0;
+		try {
+			s = 0;
+			short s0 = (short) (b[0] & 0xff);
+			short s1 = (short) (b[1] & 0xff);
+			s1 <<= 8;
+			s = (short) (s0 | s1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return s;
+		}
+		return s;
     }
 	
 	public static String bytesToHexString(byte[] src){  
@@ -186,7 +192,8 @@ public class Utils {
 	/**
 	 * 读取C语言中的uleb类型
 	 * 目的是解决整型数值浪费问题
-	 * 长度不固定，在1~5个字节中浮动
+	 * 长度不固定，在1~4个字节中浮动
+	 * 拿到最前一个 leb128 数据
 	 * @param srcByte
 	 * @param offset
 	 * @return
@@ -209,6 +216,8 @@ public class Utils {
 		}
 		return byteAry;
 	}
+
+
 	
 	/**
 	 * 解码leb128数据

@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Any/Any.iml" filepath="$PROJECT_DIR$/Any/Any.iml" />
       <module fileurl="file://$PROJECT_DIR$/Dex.iml" filepath="$PROJECT_DIR$/Dex.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/test/test.iml" filepath="$PROJECT_DIR$/test/test.iml" />
+      <module fileurl="file://D:\androidPro\Dex\Any\test.iml" filepath="D:\androidPro\Dex\Any\test.iml" />
     </modules>
   </component>
 </project>

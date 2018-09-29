@@ -1,4 +1,4 @@
-package com.makelove.dex.Bean.struct;
+package com.makelove.test.bean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ public class StringDataItem {
 	
 
 	
-	public List<Byte> utf16_size = new ArrayList<Byte>();
-	public byte data;
+	public byte[] size;
+	public byte[] data;
 
 }

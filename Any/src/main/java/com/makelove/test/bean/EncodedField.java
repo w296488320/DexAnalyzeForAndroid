@@ -1,10 +1,9 @@
-package com.makelove.dex.Bean.struct;
+package com.makelove.test.bean;
 
 
-import com.makelove.dex.utils.ParseDexUtils;
-import com.makelove.dex.utils.Utils;
+import com.makelove.test.utils.Utils;
 
-public class EncodedField {
+public class EncodedField implements getData{
 	
 	/**
 	 * struct encoded_field
@@ -15,11 +14,17 @@ public class EncodedField {
 	 */
 	public byte[] filed_idx_diff;
 	public byte[] access_flags;
-	
+
 	@Override
-	public String toString(){
-		return "field_idx_diff:"+Utils.bytesToHexString(filed_idx_diff) +
-				",access_flags:"+ Utils.bytesToHexString(filed_idx_diff);
+	public byte[] getData() {
+		return Utils.byteMergerAll(access_flags,filed_idx_diff);
+	}
+
+
+//	@Override
+//	public String toString(){
+//		return "field_idx_diff:"+Utils.bytesToHexString(filed_idx_diff) +
+//				",access_flags:"+ Utils.bytesToHexString(filed_idx_diff);
 
         //描述一个字段的详细信息
 //        FieldIdsItem fieldIdsItem = ParseDexUtils.
@@ -31,6 +36,6 @@ public class EncodedField {
 //
 //
 //				",access_flags:"+ Utils.bytesToHexString(filed_idx_diff);
-	}
+//	}
 
 }

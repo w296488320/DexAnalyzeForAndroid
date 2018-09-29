@@ -23,51 +23,71 @@ import java.util.List;
 
 
 public class ParseDexUtils {
+
+
+    //classDef 偏移 + size  = classData 起始偏移
+    //classData 偏移 + size =Dex总大小
+    //Map数据 在 Data里面
+	//用010解析 DataHeader里面的 DataSize是
+	// Data的总大小 不是 个数 （其余的是个数 ）
+	//DataSize+DataOff==fileSize
+    private static int HeaderOffset = 0;
 	
-	private static int stringIdOffset = 0;
-	private static int stringIdsSize = 0;
-	private static int stringIdsOffset = 0;
-	private static int typeIdsSize = 0;
-	private static int typeIdsOffset = 0;
-	private static int protoIdsSize = 0;
-	private static int protoIdsOffset = 0;
-	private static int fieldIdsSize = 0;
-	private static int fieldIdsOffset = 0;
-	private static int methodIdsSize = 0;
-	private static int methodIdsOffset = 0;
-	private static int classIdsSize = 0;
-	private static int classIdsOffset = 0;
-	private static int dataIdsSize = 0;
-	private static int dataIdsOffset = 0;
-	
+	private static int StringListCount = 0;
+	private static int StringListOffset = 0;
+
+	private static int typeListCount = 0;
+	private static int typeListOffset = 0;
+
+	private static int protoListCount = 0;
+	private static int protoListOffset = 0;
+
+	private static int fieldListCount = 0;
+	private static int fieldListOffset = 0;
+
+	private static int methodListCount = 0;
+	private static int methodListOffset = 0;
+
+	private static int classDefListCount = 0;
+	private static int classDefListOffset = 0;
+
+	private static int dataListCount = 0;
+
+	//ClassData  解析时候用不上 需要 根据 ClassDef里面的
+    //data_offset拿到 偏移 和大小 然后 分别赋值
+	private static int dataListOffset = 0;
+	//存放data的 偏移 比如 第一个 StringData 数据
 	private static int mapListOffset = 0;
-	
-	private static List<StringIdsItem> stringIdsList = new ArrayList<StringIdsItem>();
 
 
 
-	private static List<TypeIdsItem> typeIdsList = new ArrayList<TypeIdsItem>();
-	private static List<ProtoIdsItem> protoIdsList = new ArrayList<ProtoIdsItem>();
-	private static List<FieldIdsItem> fieldIdsList = new ArrayList<FieldIdsItem>();
-	private static List<MethodIdsItem> methodIdsList = new ArrayList<MethodIdsItem>();
-
-
-	private static List<ClassDefItem> classIdsList = new ArrayList<ClassDefItem>();
+	// public  toString 时候需要用到 数据
+	public static List<StringIdsItem> stringIdsList = new ArrayList<StringIdsItem>();
 
 
 
-	private static List<ClassDataItem> classDefItemList = new ArrayList<ClassDataItem>();
-	
-	private static List<CodeItem> directMethodCodeItemList = new ArrayList<CodeItem>();
-	private static List<CodeItem> virtualMethodCodeItemList = new ArrayList<CodeItem>();
-	
-	private static List<String> stringList = new ArrayList<String>();
+    public static List<TypeIdsItem> typeIdsList = new ArrayList<TypeIdsItem>();
+    public static List<ProtoIdsItem> protoIdsList = new ArrayList<ProtoIdsItem>();
+    public static List<FieldIdsItem> fieldIdsList = new ArrayList<FieldIdsItem>();
+    public static List<MethodIdsItem> methodIdsList = new ArrayList<MethodIdsItem>();
+
+
+    public static List<ClassDefItem> classDefIdsList = new ArrayList<ClassDefItem>();
+
+
+
+    public static List<ClassDataItem> classDataItemList = new ArrayList<ClassDataItem>();
+
+    public static List<CodeItem> directMethodCodeItemList = new ArrayList<CodeItem>();
+    public static List<CodeItem> virtualMethodCodeItemList = new ArrayList<CodeItem>();
+
+    public static List<String> stringList = new ArrayList<String>();
 
 
 
 
-	
-	private static HashMap<String, ClassDefItem>
+
+    public static HashMap<String, ClassDefItem>
 			classDataMap = new HashMap<String, ClassDefItem>();
 
 	/**
@@ -171,20 +191,20 @@ public class ParseDexUtils {
 		LogUtils.e(headerType.toString());
 
 		
-		stringIdOffset = headerType.header_size;
+		HeaderOffset = headerType.header_size;
 		
-		stringIdsSize = headerType.string_ids_size;
-		stringIdsOffset = headerType.string_ids_off;
-		typeIdsSize = headerType.type_ids_size;
-		typeIdsOffset = headerType.type_ids_off;
-		fieldIdsSize = headerType.field_ids_size;
-		fieldIdsOffset = headerType.field_ids_off;
-		protoIdsSize = headerType.proto_ids_size;
-		protoIdsOffset = headerType.proto_ids_off;
-		methodIdsSize = headerType.method_ids_size;
-		methodIdsOffset = headerType.method_ids_off;
-		classIdsSize = headerType.class_defs_size;
-		classIdsOffset = headerType.class_defs_off;
+		StringListCount = headerType.string_ids_size;
+		StringListOffset = headerType.string_ids_off;
+		typeListCount = headerType.type_ids_size;
+		typeListOffset = headerType.type_ids_off;
+		fieldListCount = headerType.field_ids_size;
+		fieldListOffset = headerType.field_ids_off;
+		protoListCount = headerType.proto_ids_size;
+		protoListOffset = headerType.proto_ids_off;
+		methodListCount = headerType.method_ids_size;
+		methodListOffset = headerType.method_ids_off;
+		classDefListCount = headerType.class_defs_size;
+		classDefListOffset = headerType.class_defs_off;
 		
 		mapListOffset = headerType.map_off;
 		
@@ -200,11 +220,11 @@ public class ParseDexUtils {
 		//单个大小
 		int idSize = StringIdsItem.getSize();
 		//个数
-		int countIds = stringIdsSize;
+		int countIds = StringListCount;
 
 		for(int i=0;i<countIds;i++){
 			stringIdsList.add(parseStringIdsItem(Utils.copyByte(srcByte,
-					stringIdsOffset+i*idSize, idSize)));
+					StringListOffset+i*idSize, idSize)));
 		}
 		LogUtils.e("string size:"+stringIdsList.size());
 
@@ -227,10 +247,10 @@ public class ParseDexUtils {
 	 */
 	public static void parseTypeIds(byte[] srcByte){
 		int idSize = TypeIdsItem.getSize();
-		int countIds = typeIdsSize;
+		int countIds = typeListCount;
 		for(int i=0;i<countIds;i++){
 			typeIdsList.add(parseTypeIdsItem(Utils.copyByte(srcByte,
-					typeIdsOffset+i*idSize, idSize)));
+					typeListOffset +i*idSize, idSize)));
 		}
 		//这里的descriptor_idx就是解析之后的字符串中的索引值
 		for(TypeIdsItem item : typeIdsList){
@@ -249,11 +269,11 @@ public class ParseDexUtils {
 		//获取大小
 		int idSize = ProtoIdsItem.getSize();
 		//个数
-		int countIds = protoIdsSize;
+		int countIds = protoListCount;
 
 		for(int i=0;i<countIds;i++){
 			protoIdsList.add(parseProtoIdsItem(Utils.copyByte(srcByte,
-                    protoIdsOffset+i*idSize, idSize)));
+                    protoListOffset +i*idSize, idSize)));
 		}
 
         for(ProtoIdsItem item : protoIdsList){
@@ -339,10 +359,10 @@ public class ParseDexUtils {
 	 */
 	public static void parseFieldIds(byte[] srcByte){
 		int idSize = FieldIdsItem.getSize();
-		int countIds = fieldIdsSize;
+		int countIds = fieldListCount;
 		for(int i=0;i<countIds;i++){
 			fieldIdsList.add(parseFieldIdsItem(Utils.copyByte(srcByte,
-					fieldIdsOffset+i*idSize, idSize)));
+					fieldListOffset +i*idSize, idSize)));
 		}
 		
 		for(FieldIdsItem item : fieldIdsList){
@@ -363,10 +383,10 @@ public class ParseDexUtils {
 	 */
 	public static void parseMethodIds(byte[] srcByte){
 		int idSize = MethodIdsItem.getSize();
-		int countIds = methodIdsSize;
+		int countIds = methodListCount;
 		for(int i=0;i<countIds;i++){
 			methodIdsList.add(parseMethodIdsItem(Utils.copyByte(srcByte,
-					methodIdsOffset+i*idSize, idSize)));
+					methodListOffset +i*idSize, idSize)));
 		}
 		
 		for(MethodIdsItem item : methodIdsList){
@@ -404,55 +424,78 @@ public class ParseDexUtils {
 	 * @param srcByte
 	 */
 	public static void parseClassDefIds(byte[] srcByte){
-		LogUtils.e("classIdsOffset:"+Utils.bytesToHexString(Utils.int2Byte(classIdsOffset)));
-		LogUtils.e("classIds:"+classIdsSize);
+		LogUtils.e("开始 偏移的16进制 classDefListOffset:"+
+				Utils.bytesToHexString(Utils.int2Byte(classDefListOffset)));
+		LogUtils.e("classDefSize的 个数:"+ classDefListCount);
 		int idSize = ClassDefItem.getSize();
-		int countIds = classIdsSize;
+		int countIds = classDefListCount;
 		for(int i=0;i<countIds;i++){
-			classIdsList.add(parseClassDefItem(Utils.copyByte(srcByte, classIdsOffset+i*idSize, idSize)));
+			classDefIdsList.add(parseClassDefItem(Utils.copyByte(srcByte,
+                    classDefListOffset +i*idSize, idSize)));
 		}
-		for(ClassDefItem item : classIdsList){
-			LogUtils.e("ClassDefIds","item:"+item);
-			int classIdx = item.class_idx;
-			TypeIdsItem typeItem = typeIdsList.get(classIdx);
-
+		for(ClassDefItem item : classDefIdsList){
+            //class_idx指向TypeID 的 index
+			TypeIdsItem typeItem = typeIdsList.get(item.class_idx);
 			LogUtils.e("ClassDefIds","classIdx:"+stringList.get(typeItem.descriptor_idx));
 
 
-
-
-			int superClassIdx = item.superclass_idx;
-			TypeIdsItem superTypeItem = typeIdsList.get(superClassIdx);
+			TypeIdsItem superTypeItem = typeIdsList.get(item.superclass_idx);
 			LogUtils.e("ClassDefIds","superitem:"+stringList.get(superTypeItem.descriptor_idx));
-			int sourceIdx = item.source_file_idx;
-			String sourceFile = stringList.get(sourceIdx);
-			LogUtils.e("ClassDefIds","sourceFile:"+sourceFile);
+
+			LogUtils.e("ClassData 偏移 "+item.class_data_off);
+
+			//如果 没有找到源文件名 资源  默认被赋值FFFF FFFF FFFF FFFF也就是 -1
+            //LogUtils.e("source_file_idx",item.source_file_idx+"");
+            String sourceFile=null;
+            // Key用class_idx
+            if(item.source_file_idx==-1) {
+                sourceFile = stringList.get(typeItem.descriptor_idx);
+                LogUtils.e("ClassDefIds","没有找到 source_file_idx");
+            }else {
+                sourceFile = stringList.get(item.source_file_idx);
+                LogUtils.e("ClassDefIds","sourceFile:"+sourceFile);
+            }
+
+
 			classDataMap.put(sourceFile, item);
 		}
 	}
 	/**
 	 * 解析 ClassDefIds->ClassData
+     * 一个classDef对应 一个 classData
 	 * @param srcByte
 	 */
 	public static void parseClassData(byte[] srcByte){
 		for(String key : classDataMap.keySet()){
 			int dataOffset = classDataMap.get(key).class_data_off;
-			LogUtils.e("data offset:"+Utils.bytesToHexString(Utils.int2Byte(dataOffset)));
+			//LogUtils.e("data offset:"+Utils.bytesToHexString(Utils.int2Byte(dataOffset)));
 			ClassDataItem item = parseClassDataItem(srcByte, dataOffset);
-			classDefItemList.add(item);
+
+			classDataItemList.add(item);
 			LogUtils.e("class item:"+item);
 		}
 	}
+
+
+
 	/**
 	 * 解析 ClassDefIds->ClassData->ClassDataItem
+     * 对ClassDataItem 进行解析 可以得到 ClassData 具体
 	 * @param srcByte
 	 */
 	private static ClassDataItem parseClassDataItem(byte[] srcByte, int offset){
+        //LogUtils.e("size 开始偏移地址:  "+offset);
 		ClassDataItem item = new ClassDataItem();
+        // 4个 leb128变量
 		for(int i=0;i<4;i++){
 			byte[] byteAry = Utils.readUnsignedLeb128(srcByte, offset);
+			//LogUtils.e("偏移基地址"+offset);
+            //LogUtils.e("ByteLength"+byteAry.length);   最前面一个  1
+            //循环了4次 把四个size赋值以后
+            // 剩下的 就是 4个  Encoded 的 数据
 			offset += byteAry.length;
 			int size = 0;
+
 			if(byteAry.length == 1){
 				size = byteAry[0];
 			}else if(byteAry.length == 2){
@@ -472,18 +515,25 @@ public class ParseDexUtils {
 		}
 		
 		
-		// static_fields 
+		// static_fields
+        //每一个 ClassData有多个 EncodedField  和 EncodeMethod
+        //顺序排列
 		EncodedField[] staticFieldAry = new EncodedField[item.static_fields_size];
+
+        //LogUtils.e("Encoded 开始偏移地址:  "+offset);
 		for(int i=0;i<item.static_fields_size;i++){
 			/**
 			 *  public int filed_idx_diff;
 				public int access_flags;
 			 */
 			EncodedField staticField = new EncodedField();
+			//  Encode里面都是 Leb128数据  先拿到 第一个 数据
 			staticField.filed_idx_diff = Utils.readUnsignedLeb128(srcByte, offset);
 			offset += staticField.filed_idx_diff.length;
+			//分别赋值
 			staticField.access_flags = Utils.readUnsignedLeb128(srcByte, offset);
 			offset += staticField.access_flags.length;
+
 			staticFieldAry[i] = staticField;
 		}
 		
@@ -502,7 +552,8 @@ public class ParseDexUtils {
 			instanceFieldAry[i] = instanceField;
 		}
 		
-		// static_methods 
+		// static_methods
+        //和上面数据 是连续上的 不是分开的
 		EncodedMethod[] staticMethodsAry = new EncodedMethod[item.direct_methods_size];
 		for(int i=0;i<item.direct_methods_size;i++){
 			/**
@@ -515,7 +566,11 @@ public class ParseDexUtils {
 			offset += directMethod.method_idx_diff.length;
 			directMethod.access_flags = Utils.readUnsignedLeb128(srcByte, offset);
 			offset += directMethod.access_flags.length;
+
+
+
 			directMethod.code_off = Utils.readUnsignedLeb128(srcByte, offset);
+            //LogUtils.e("code_off 开始偏移地址:  "+directMethod.code_off.length);
 			offset += directMethod.code_off.length;
 			staticMethodsAry[i] = directMethod;
 		}
@@ -545,12 +600,19 @@ public class ParseDexUtils {
 		
 		return item;
 	}
-	
-	public static void parseCode(byte[] srcByte){
-		for(ClassDataItem item : classDefItemList){
-			
+
+    /**
+     * 解析 classDataItemList  里面 具体 数据
+     * 有几个 Encoded
+     * @param srcByte
+     */
+    public static void parseCode(byte[] srcByte){
+		for(ClassDataItem item : classDataItemList){
+			//分别对 2个Encode进行解析
 			for(EncodedMethod item1 : item.direct_methods){
+			    //拿到偏移
 				int offset = Utils.decodeUleb128(item1.code_off);
+
 				CodeItem items = parseCodeItem(srcByte, offset);
 				directMethodCodeItemList.add(items);
 				LogUtils.e("direct method item:"+items);
@@ -610,9 +672,12 @@ public class ParseDexUtils {
 	public static void parseMapItemList(byte[] srcByte){
 		MapList mapList = new MapList();
 		byte[] sizeByte = Utils.copyByte(srcByte, mapListOffset, 4);
+		//size是 Item的个数
 		int size = Utils.byte2int(sizeByte);
 		for(int i=0;i<size;i++){
-			mapList.map_item.add(parseMapItem(Utils.copyByte(srcByte, mapListOffset+4+i*MapItem.getSize(), MapItem.getSize())));
+			mapList.map_item.add(parseMapItem(Utils.copyByte(srcByte,
+                    //因为只有一个size所以只+4
+                    mapListOffset+4+i*MapItem.getSize(), MapItem.getSize())));
 		}
 	}
 	
@@ -634,8 +699,10 @@ public class ParseDexUtils {
 		ProtoIdsItem item = new ProtoIdsItem();
 		byte[] shortyIdxByte = Utils.copyByte(srcByte, 0, 4);
 		item.shorty_idx = Utils.byte2int(shortyIdxByte);
-		byte[] returnTypeIdxByte = Utils.copyByte(srcByte, 4, 8);
-		item.return_type_idx = Utils.byte2int(returnTypeIdxByte);
+
+		byte[] returnTypeIdxByteTest = Utils.copyByte(srcByte, 4, 4);
+		item.return_type_idx = Utils.byte2int(returnTypeIdxByteTest);
+
 		byte[] parametersOffByte = Utils.copyByte(srcByte, 8, 4);
 		item.parameters_off = Utils.byte2int(parametersOffByte);
 		return item;

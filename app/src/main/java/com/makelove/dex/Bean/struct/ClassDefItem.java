@@ -23,7 +23,12 @@ public class ClassDefItem {
 
 	public int source_file_idx;
 	public int annotations_off;
-	public int class_data_off;
+
+    /**
+     * 指向 ClassData的 偏移
+     * 没有则为0
+     */
+    public int class_data_off;
 	public int static_value_off;
 	
 	public final static int 
